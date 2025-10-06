@@ -18,10 +18,10 @@ abstract contract Reflectable128x128 is BEP20 { // inherits: Ownable.sol, Contex
         unchecked {
             uint256 supply = super.totalSupply(); // Need the previous total supply before overriding `totalSupply()` because _rTotal at this point is 0.
 
-            if (supply > MAX128) {
+            if (supply > uint256(MAX128)) {
                 revert SUPPLY_OVERFLOW();
             }
-            if (MAX128 / uint128(supply) < 1e12) {
+            if ((MAX128 / uint128(supply)) < 1e12) {
                 revert INSUFFICIENT_PRECISION({ required: 1e12, current: MAX128 / uint128(supply) });
             }
 
@@ -34,6 +34,7 @@ abstract contract Reflectable128x128 is BEP20 { // inherits: Ownable.sol, Contex
 
     mapping (address => Account) internal _balances;
 
+    uint128 internal constant MAX128 = 340282366920938463463374607431768211455;
     uint128 internal immutable _tTotal;
     uint128 internal _rTotal;
     
@@ -49,7 +50,7 @@ abstract contract Reflectable128x128 is BEP20 { // inherits: Ownable.sol, Contex
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /// @dev See {IBEP20-balanceOf},
-    function balanceOf(address account) public view virtual override returns (uint) { // uint128 => uint256
+    function balanceOf(address account) public view virtual override returns (uint256) { // uint128 => uint256
         return _balances[account].isExcluded ? _balances[account].tOwned : tokenFromReflection(_balances[account].rOwned);
     }
 
